@@ -1,53 +1,56 @@
-let playerWins = 0;
-let computerWins = 0;
-let ties = 0;
-let rockBtn = document.querySelector('.btn-rock')
-let paperBtn = document.querySelector('.btn-paper')
-let scissorBtn = document.querySelector('.btn-scissor')
+let playerScore = 0
+let computerScore = 0
+const buttons = document.querySelectorAll('input')
 
-
-const choices = ["pierre","feuille","ciseaux"];
-
-function getComputerChoice() {
-  const randIndex = Math.floor(Math.random()*choices.length);
-  return choices[randIndex].toLowerCase();
+function computerPlay() {
+    let choices = ['rock', 'paper', 'scissors']
+    return choices[Math.floor(Math.random() * choices.length)]
 }
 
-function getPlayerChoice() {
-  let choice = prompt('Choisissez entre pierre, feuille, ciseaux');
-  return choice.toLowerCase();
+function disableButtons() {
+    buttons.forEach(elem => {
+        elem.disabled = true
+    })
 }
 
-function getRoundWinner(playerChoice, computerChoice) {
-  if (playerChoice === computerChoice) {
-    ties++;
-    return `Égalité !`;
-  } else if ((playerChoice === 'pierre' && computerChoice === 'ciseaux') ||
-             (playerChoice === 'feuille' && computerChoice === 'pierre') ||
-             (playerChoice === 'ciseaux' && computerChoice === 'feuille')) {
-    playerWins++;
-    return `Vous avez gagné !`;
-  } else {
-    computerWins++;
-    return `L'ordinateur a gagné !`;
-  }
+function playRound(playerSelection) {
+    let computerSelection = computerPlay()
+    let result = ""
+
+    if ((playerSelection == 'rock' && computerSelection == 'scissors') ||
+        (playerSelection == 'scissors' && computerSelection == 'paper') ||
+        (playerSelection == 'paper' && computerSelection == 'rock')) {
+        
+        playerScore += 1
+        result = ('You win! ' + playerSelection + ' beats ' + computerSelection
+            + "<br><br>Player score: " + playerScore + "<br>Computer score: " + computerScore)
+
+        if (playerScore == 5) {
+            result += '<br><br>You won the game! Reload the page to play again'
+            disableButtons()
+        }
+    }
+    else if (playerSelection == computerSelection) {
+        result = ('It\'s a tie. You both chose ' + playerSelection
+            + "<br><br>Player score: " + playerScore + "<br>Computer score: " + computerScore)
+    }
+    else {
+        computerScore += 1
+        result = ('You lose! ' + computerSelection + ' beats ' + playerSelection
+            + "<br><br>Player score: " + playerScore + "<br>Computer score: " + computerScore)
+
+        if (computerScore == 5) {
+            result += '<br><br>I won the game! Reload the page to play again'
+            disableButtons()
+        }
+    }
+
+    document.querySelector('.playresult').innerHTML = result
+    return
 }
 
-function game() {
-  for (let round = 1; round <= 5; round++) {
-    let playerChoice = getPlayerChoice();
-    let computerChoice = getComputerChoice();
-    console.log(`Round ${round}: Vous avez choisi ${playerChoice}, l'ordinateur a choisi ${computerChoice}.`);
-    console.log(getRoundWinner(playerChoice, computerChoice));
-  }
-  
-  if (playerWins < computerWins) {
-    console.log("L'ordinateur remporte la partie !");
-  } else if (playerWins > computerWins) {
-    console.log("Vous remportez la partie !");
-  } else {
-    console.log("La partie est nulle !");
-  }
-}
-
-game();
+buttons.forEach(button =>{
+    button.addEventListener('click', function(){
+        playRound(button.value)
+    })
+})
